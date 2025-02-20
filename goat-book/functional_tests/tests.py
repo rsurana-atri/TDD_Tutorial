@@ -69,3 +69,46 @@ class NewVisitorTest(LiveServerTestCase):
         self.wait_for_row_in_list_table("2: Internetworking Lab 6")
 
         # Satisfied, she closes the browser.
+
+    def test_multiple_users_can_start_lists_at_different_urls(self):
+        # Risha starts a new to-do list
+        self.browser.get(self.live_server_url)
+        inputbox = self.browser.find_element(By.ID, "id_new_item")
+        inputbox.send_keys(" OS Project 2")
+        inputbox.send_keys(Keys.ENTER)
+        self.wait_for_row_in_list_table("1: OS Project 2")
+
+        # She notices that her list has a unique URL
+        edith_list_url = self.browser.current_url
+        self.assertRegex(edith_list_url, "/lists/.+") 
+
+        # Now a new user, Andrew, comes along to the site.
+
+        ## We delete all the browser's cookies
+        ## as a way of simulating a brand new user session  
+        self.browser.delete_all_cookies()
+
+        # Andrew visits the home page.  There is no sign of Risha's
+        # list
+        self.browser.get(self.live_server_url)
+        page_text = self.browser.find_element(By.TAG_NAME, "body").text
+        self.assertNotIn("Os Project 2", page_text)
+        self.assertNotIn("Internetworking", page_text)
+
+        # Andrew starts a new list by entering a new item
+        inputbox = self.browser.find_element(By.ID, "id_new_item")
+        inputbox.send_keys("Buy milk")
+        inputbox.send_keys(Keys.ENTER)
+        self.wait_for_row_in_list_table("1: Buy milk")
+
+        # Andrew gets his own unique URL
+        francis_list_url = self.browser.current_url
+        self.assertRegex(francis_list_url, "/lists/.+")
+        self.assertNotEqual(francis_list_url, edith_list_url)
+
+        # Again, there is no trace of Risha's list
+        page_text = self.browser.find_element(By.TAG_NAME, "body").text
+        self.assertNotIn("OS Project 2", page_text)
+        self.assertIn("Buy milk", page_text)
+
+        # Satisfied, they both go back to sleep

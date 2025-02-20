@@ -33,7 +33,6 @@ class NewVisitorTest(unittest.TestCase):
         # The page updates again, and now shows both items on her list
 
         # Satisfied, she closes the browser.
-        self.browser.quit()
 
 
 if __name__ == "__main__":  

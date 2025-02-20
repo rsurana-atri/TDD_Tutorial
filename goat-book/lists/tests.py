@@ -3,7 +3,6 @@ from django.http import HttpRequest
 from lists.views import home_page
 from lists.models import Item
 from django.test import LiveServerTestCase
-from selenium import webdriver
 
 
 class HomePageTest(TestCase):
@@ -28,8 +27,6 @@ class HomePageTest(TestCase):
         response = self.client.post("/", data={"item_text": "A new list item"})
         self.assertRedirects(response, "/")
 
-    def test_can_start_a_todo_list(self):
-        self.browser.get(self.live_server_url)
 
 class ItemModelTest(TestCase):
     def test_saving_and_retrieving_items(self):
@@ -48,8 +45,3 @@ class ItemModelTest(TestCase):
         second_saved_item = saved_items[1]
         self.assertEqual(first_saved_item.text, "The first (ever) list item")
         self.assertEqual(second_saved_item.text, "Item the second")
-
-class NewVisitorTest(LiveServerTestCase):
-    # def setUp(self):
-    #     pass
-

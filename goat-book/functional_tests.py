@@ -10,7 +10,13 @@ class NewVisitorTest(unittest.TestCase):
         self.browser = webdriver.Firefox()  
 
     def tearDown(self):  
-        self.browser.quit()
+        self.browser.quit(
+        )
+
+    def check_for_row_in_list_table(self, row_text):
+        table = self.browser.find_element(By.ID, "id_list_table")
+        rows = table.find_elements(By.TAG_NAME, "tr")
+        self.assertIn(row_text, [row.text for row in rows])
 
 
     def test_can_start_a_todo_list(self):  
@@ -33,18 +39,26 @@ class NewVisitorTest(unittest.TestCase):
 
         # When she hits enter, the page updates, and now the page lists
         # "1: OS Project 2" as an item in a to-do list
-        inputbox.send_keys(Keys.ENTER)  
-        time.sleep(1)  
-    
-        table = self.browser.find_element(By.ID, "id_list_table")
-        rows = table.find_elements(By.TAG_NAME, "tr")  
-        self.assertTrue(any(row.text == "1: OS Project 2" for row in rows),"New to-do item did not appear in table",)
+        inputbox.send_keys(Keys.ENTER)
+        time.sleep(1)
+
+        table = self.browser.find_element(By.ID, "id_list_table")  
+        rows = table.find_elements(By.TAG_NAME, "tr")
+        self.check_for_row_in_list_table("1: OS Project 2")
+
 
         # There is still a text box inviting her to add another item.
         # She enters "Internetworking Lab 6"
-        self.fail("Finish the test!")
+        inputbox = self.browser.find_element(By.ID, "id_new_item")
+        inputbox.send_keys("Internetworking Lab 6")
+        inputbox.send_keys(Keys.ENTER)
+        time.sleep(1)
 
         # The page updates again, and now shows both items on her list
+        table = self.browser.find_element(By.ID, "id_list_table")
+        rows = table.find_elements(By.TAG_NAME, "tr")
+        self.check_for_row_in_list_table("1: OS Project 2")
+        self.check_for_row_in_list_table("2: Internetworking Lab 6")
 
         # Satisfied, she closes the browser.
 
